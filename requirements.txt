@@ -8,7 +8,7 @@ geopy==2.1.0
 h11==0.12.0
 idna==2.10
 numpy==1.19.5
-pandas==1.2.0
+pandas
 pydantic==1.7.3
 python-dateutil==2.8.1
 python-dotenv==0.15.0
