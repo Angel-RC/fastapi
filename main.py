@@ -25,18 +25,9 @@ API_KEY_NOMINATIM = "9uinTsTkDhB4bXzuV6VWM5qGLBliACMS"
 app = FastAPI()
 
 
-origins = [
-    "http://localhost:3000",
-    "localhost:3000"
-]
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"]
-)
-
+@app.get("/")
+def home():
+    return {"message":"Hello TutLinks.com"}
 
 
 @app.post("/upload_file_fleet/")
