@@ -6,7 +6,9 @@ from io import BytesIO
 from fastapi import FastAPI, File, UploadFile, Query, Body, Path
 from geopy.geocoders import Nominatim, GoogleV3
 from fastapi.middleware.cors import CORSMiddleware
-
+import ortools
+from ortools.constraint_solver import routing_enums_pb2
+from ortools.constraint_solver import pywrapcp
 
 def convertBytesToJson(bytes):
     df = pd.read_csv(BytesIO(bytes), sep = ";")
@@ -47,6 +49,47 @@ def home():
 async def upload_file_fleet(file: UploadFile = File(...)):
     contents = await file.read()
     fleet_json = convertBytesToJson(contents)
+
+    from ortools.constraint_solver import routing_enums_pb2
+    from ortools.constraint_solver import pywrapcp
+
+    data = {}
+    data['distance_matrix'] = [
+        [0, 100, 9, 100, 4],
+        [9, 0, 2, 1, 1],
+        [5, 1, 0, 1, 1],
+        [1, 1, 1, 0, 1],
+        [1, 1, 1, 1, 0]
+
+    ]
+
+    data['time_matrix'] = [
+        [0, 1, 9, 3, 99],
+        [9, 0, 2, 99, 99],
+        [5, 1, 0, 99, 99],
+        [99, 99, 0, 0, 1],
+        [1, 99, 99, 99, 0]
+    ]
+
+    data['demands'] = [0, 1, 1, 1, 1]
+    data['time_windows'] = [
+        (0, 230),  # depot
+        (7, 120),  # 1
+        (3, 11),  # 2
+        (7, 120),  # 3
+        (5, 120)  # 4
+
+    ]
+    data['vehicle_capacities'] = [1, 3]
+    data['vehicle_limit_distance'] = [1000, 1000]
+    data['vehicle_final_time'] = [995, 910]
+    data['num_vehicles'] = 2
+    data['depot'] = 0
+    data["vehicle_horary"] = [[None, 100], [None, 100]]
+    # Create the routing index manager.
+    manager = pywrapcp.RoutingIndexManager(len(data['time_matrix']),
+                                           data['num_vehicles'],
+                                           data['depot'])
     return {"fleet": fleet_json}
 
 
