@@ -26,3 +26,4 @@ gunicorn==20.0.4
 uvloop
 uvicorn
 httptools
+ortools
