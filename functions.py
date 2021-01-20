@@ -1,3 +1,15 @@
+from geopy.geocoders import Nominatim, GoogleV3
+
+def geolocalization(df, API_KEY_NOMINATIM, API_KEY_GOOGLE):
+
+    geolocator_nominatim = Nominatim(user_agent=API_KEY_NOMINATIM)
+    geolocator_google = GoogleV3(api_key=API_KEY_GOOGLE)
+
+    df['LOCALIZACION'] = df['DIRECCION'].apply(
+        lambda DIRECCION: geocode_2_options(geolocator_nominatim, geolocator_google, DIRECCION))
+
+    return df
+
 
 def geocode_2_options(geolocator_1, geolocator_2, address):
     """
