@@ -41,7 +41,11 @@ app.add_middleware(
 
 @app.get("/")
 def home():
-    return {"message":"Hello"}
+    a=["Ayuntamiento, Cuenca"]
+    df = pd.DataFrame(a, columns = ["DIRECCION"])
+    df = geolocalization(df, API_KEY_NOMINATIM, API_KEY_GOOGLE)
+    js = convertPandasToJson(df)
+    return js
 
 
 
@@ -50,8 +54,6 @@ async def upload_file_fleet(file: UploadFile = File(...)):
     contents = await file.read()
     fleet_json = convertBytesToJson(contents)
 
-    from ortools.constraint_solver import routing_enums_pb2
-    from ortools.constraint_solver import pywrapcp
 
     data = {}
     data['distance_matrix'] = [
