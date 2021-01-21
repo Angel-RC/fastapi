@@ -69,21 +69,14 @@ async def upload_file_fleet(file: UploadFile = File(...)):
     return {"depositos": depot_js, "fleet": fleet_js}
 
 
-
 @app.post("/upload_file_locations/")
-async def upload_file_locations(file: UploadFile = File(...),
-                               API_KEY_GOOGLE: str = API_KEY_GOOGLE,
-                               API_KEY_NOMINATIM: str = API_KEY_NOMINATIM
-                               ):
+async def upload_file_locations(file: UploadFile = File(...)):
+
     contents = await file.read()
     nodes_df = pd.read_csv(BytesIO(contents), sep=";")
+    nodes_df["TIPO"] = "DESTINO"
 
-
-    geolocator_nominatim = Nominatim(user_agent=API_KEY_NOMINATIM)
-    geolocator_google = GoogleV3(api_key=API_KEY_GOOGLE)
-
-    nodes_df['LOCALIZACION'] = nodes_df['DESTINO'].apply(lambda DESTINOS: geocode_2_options(geolocator_nominatim, geolocator_google, DESTINOS))
-
+    nodes_df = geolocalization(nodes_df, API_KEY_NOMINATIM, API_KEY_GOOGLE)
 
     nodes_js = convertPandasToJson(nodes_df)
 
