@@ -80,7 +80,7 @@ async def upload_file_locations(file: UploadFile = File(...)):
 
     nodes_js = convertPandasToJson(nodes_df)
 
-    return(nodes_js)
+    return nodes_js
 
 
 @app.put("/create_matrix/")
