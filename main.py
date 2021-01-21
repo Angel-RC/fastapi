@@ -30,7 +30,8 @@ app = FastAPI()
 origins = [
     "http://localhost:3000",
     "localhost:3000",
-    "https://angel-rc.github.io"
+    "https://angel-rc.github.io",
+    "https://angel-rc.github.io/locations"
 ]
 app.add_middleware(
     CORSMiddleware,
