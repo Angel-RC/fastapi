@@ -22,6 +22,7 @@ def convertPandasToJson(data):
 
 from functions import *
 
+API_KEY_HERE = "hmSSiaijHF50NAc6cA5Pah1OQdKqzriQyfBIH_oZCdI"
 API_KEY_GOOGLE = "AIzaSyD9Gzh3Q5hQtKx9G0T2dLZNW6KfVy_dzEg"
 API_KEY_NOMINATIM = "9uinTsTkDhB4bXzuV6VWM5qGLBliACMS"
 app = FastAPI()
@@ -51,48 +52,22 @@ def home():
 
 @app.post("/upload_file_fleet/")
 async def upload_file_fleet(file: UploadFile = File(...)):
+
+    # Create fleet_js
     contents = await file.read()
-    fleet_json = convertBytesToJson(contents)
+    fleet_df = pd.read_csv(BytesIO(contents), sep=";")
+    fleet_js = convertPandasToJson(fleet_df)
 
+    # Create depot_js
+    depot_set = set(fleet_df['ORIGEN'].tolist() + fleet_df['FINAL'].tolist())
+    depot_df = pd.DataFrame(depot_set, columns = ["DIRECCION"])
+    depot_df["TIPO"] = "DEPOSITO"
 
-    data = {}
-    data['distance_matrix'] = [
-        [0, 100, 9, 100, 4],
-        [9, 0, 2, 1, 1],
-        [5, 1, 0, 1, 1],
-        [1, 1, 1, 0, 1],
-        [1, 1, 1, 1, 0]
+    depot_df = geolocalization(depot_df, API_KEY_NOMINATIM, API_KEY_GOOGLE)
+    depot_js = convertPandasToJson(depot_df)
 
-    ]
+    return {"depositos": depot_js, "fleet": fleet_js}
 
-    data['time_matrix'] = [
-        [0, 1, 9, 3, 99],
-        [9, 0, 2, 99, 99],
-        [5, 1, 0, 99, 99],
-        [99, 99, 0, 0, 1],
-        [1, 99, 99, 99, 0]
-    ]
-
-    data['demands'] = [0, 1, 1, 1, 1]
-    data['time_windows'] = [
-        (0, 230),  # depot
-        (7, 120),  # 1
-        (3, 11),  # 2
-        (7, 120),  # 3
-        (5, 120)  # 4
-
-    ]
-    data['vehicle_capacities'] = [1, 3]
-    data['vehicle_limit_distance'] = [1000, 1000]
-    data['vehicle_final_time'] = [995, 910]
-    data['num_vehicles'] = 2
-    data['depot'] = 0
-    data["vehicle_horary"] = [[None, 100], [None, 100]]
-    # Create the routing index manager.
-    manager = pywrapcp.RoutingIndexManager(len(data['time_matrix']),
-                                           data['num_vehicles'],
-                                           data['depot'])
-    return {"fleet": fleet_json}
 
 
 @app.post("/upload_file_locations/")
