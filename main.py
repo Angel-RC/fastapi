@@ -51,6 +51,11 @@ def home():
 
 
 
+@app.get("/prueba")
+def home(nodes_js = Body(...)):
+    return jnodes_js
+
+
 @app.post("/upload_file_fleet/")
 async def upload_file_fleet(file: UploadFile = File(...)):
 
@@ -107,6 +112,15 @@ def HEREAPI_matrix(API_KEY : str ="hmSSiaijHF50NAc6cA5Pah1OQdKqzriQyfBIH_oZCdI",
 
     return (graph)
 
+
+@app.post("/solve_problem/")
+async def solve_problem(nodes_js = Body(...),
+                        mode: str="fastest;car",
+                        summary: str="traveltime,distance"):
+
+
+
+    return nodes_js
 
 
 
